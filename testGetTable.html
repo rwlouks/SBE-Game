@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+ PlayBlue.php
+
+--> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<style>
+   .results 
+   {
+     //height: 350px;
+     overflow: auto;
+   } 
+   
+   table
+   {
+        border:1px solid black;    
+   }
+   td
+   {
+    padding:'5';
+    text-align:center;
+    vertical-align: middle;
+    position: relative;
+   }
+   th
+   {
+    text-align:center;
+    background-color: #006699;
+    color:white;
+   }
+  </style>
+
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.1.min.js"></script>
+
+
+<script>
+var roundComplete = "Null";
+var waiting;
+function selectValue ($Value)
+    {
+      document.getElementById("userMessage").innerHTML = "Waiting";
+      $.post("AddRoundInfo.php",
+      {
+        GameID:getCookie("SBEGame_GameID"),
+        PlayerColor:getCookie("SBEGame_PlayerColor"),
+        RoundNum:getCookie("SBEGame_RoundNum"),
+        Selection:$Value
+      },
+      function (data, status){
+       
+      //alert(window.parent.location);
+      //alert("Data: " + data +"\nStatus: " + status);
+      //do
+      //{
+        waiting = setInterval(function(){checkRoundComplete()},1000);
+        //checkRoundComplete();
+        //setTimeout(function(){alert(roundComplete);}, 2000);
+
+        
+            //}
+      //while (!complete);
+      //alert("Back from checkRoundComplete");
+      //window.self.close();
+      }
+      );
+    }
+ 
+ 
+    
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) != -1) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "Not Found";
+   }
+   
+function checkRoundComplete()
+{
+  $.post("roundCompleteCheck.php",
+    {
+      GameID:getCookie("SBEGame_GameID"),
+      RoundNum:getCookie("SBEGame_RoundNum")-1
+    },
+    function (data, status){
+    //alert("From roundCompleteCheck:" + data + "\nStatus: " +status);
+    document.getElementById("userMessage").innerHTML = data;
+    roundComplete = data;
+    if (roundComplete.indexOf("Waiting") < 0)
+    {
+      //alert(roundComplete);
+      clearInterval(waiting);
+      var colorResult = getCookie("SBEGame_ColorSelected");
+      colorResult = colorResult.toLowerCase();
+      flashFile = 'urn-' + colorResult + '.swf';
+      var urnResult = getCookie("SBEGame_UrnResult");
+      //alert("urnResult: " + urnResult + "  flashFile: " + flashFile);
+      //alert(document.cookie);
+      changeUrn (urnResult, flashFile);
+      playUrn(urnResult);
+      getTable();
+      var gameOverFlag = getCookie("SBEGame_GameOver");
+      //alert ("gameOverFlag: "+gameOverFlag);
+      //alert (document.cookie);
+      if (gameOverFlag == 1)
+      {
+        gameOver();
+  
+      }
+    }
+    //getTable();
+    }
+    
+    );
+   
+}
+ function gameOver() {
+    //alert ("gameOver function called");
+    window.open("gameOver.php", "_blank", "toolbar=yes, scrollbars=yes, resizable=yes, width=400, height=400");
+    
+    
+}
+
+function getTable(){
+  $("#tableContents").load("generateTable.php", function(response,status)
+      {
+        alert("Back from generateTable\n" + response);
+      });
+}
+
+function playUrn(urnResult) {
+ 	
+ 	//alert(urnResult);
+ 	var urnID = "Urn"+urnResult;
+ 	//alert("urnID " + urnID);
+ 	setTimeout(function(){document.getElementById(urnID).play()},500);
+ 	
+ 	}  
+
+function changeUrn(urnResult, flashFile) {
+      var flashSrc ='<object id = Urn' + urnResult + ' data= ' + flashFile + ' width = "100" height = "190" type="application/vnd.adobe.flash-movie" >';
+      flashSrc += '<param name="loop" value="false">';
+      flashSrc += '<param name="play" value="false">';
+      flashSrc += '</object>';
+      flashSrc += '<figcaption>Urn' + urnResult + '</figcaption>';
+
+      document.getElementById('fig' + urnResult).innerHTML = flashSrc;
+ 
+}	     
+</script>
+
+
+
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>testGetTable</title>
+
+</head>
+
+<body>
+
+<div class="container">
+   <div class="contentArea">
+ 
+        <h1>Play Blue</h1> 
+  </div>
+  
+  <figure id = "fig11">
+    <object id = "Urn11" data= "urn-green.swf" width = "100" height = "190" type="application/vnd.adobe.flash-movie" >
+      <param name="loop" value="false">
+      <param name="play" value="false">
+    </object>
+    <figcaption>Urn 11</figcaption>
+  </figure>
+  <figure id = "fig12">
+    <object id = "Urn12" data= "urn-green.swf" width = "100" height = "190" type="application/vnd.adobe.flash-movie" >
+      <param name="loop" value="false">
+      <param name="play" value="false">
+    </object>
+    <figcaption>Urn 12</figcaption>
+  </figure>
+  <figure id = "fig21">
+    <object id = "Urn21" data= "urn-green.swf" width = "100" height = "190" type="application/vnd.adobe.flash-movie" >
+      <param name="loop" value="false">
+      <param name="play" value="false">
+    </object>
+    <figcaption>Urn 21</figcaption>
+  </figure>
+  <figure id = "fig22">
+    <object id = "Urn22" data= "urn-green.swf" width = "100" height = "190" type="application/vnd.adobe.flash-movie" >
+      <param name="loop" value="false">
+      <param name="play" value="false">
+    </object>
+    <figcaption>Urn 22</figcaption>
+  </figure><br>
+
+  <div class = "results">
+    <table id="tableContents" border="1">
+    <tr><th>Fake Heading</th></tr>
+    </table>
+  </div>            
+ 
+
+    
+  <p>Click the button to play the next round</p>
+  <button onclick="getTable()">Get Table</button>
+  
+ </div>
+ <footer>
+  <img src="footer.png" width="963" height="159" />
+  </footer> 
+  </body>
+</html>

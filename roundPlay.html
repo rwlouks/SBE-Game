@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+roundPlay.html
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Round Play</title>
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.1.min.js"></script>
+
+<script>
+
+function selectValue ($Value)
+    {
+      $.post("AddRoundInfo.php",
+      {
+        GameID:getCookie("SBEGame_GameID"),
+        PlayerColor:getCookie("SBEGame_PlayerColor"),
+        RoundNum:getCookie("SBEGame_RoundNum"),
+        Selection:$Value
+      },
+      function (data, status){
+      alert(window.parent.location);
+      //alert("Data: " + data +"\nStatus: " + status);
+      //do
+      //{
+        complete = checkRoundComplete();
+        //setTimeout(function(){}, 2000);
+      //}
+      //while (!complete);
+      //alert("Back from checkRoundComplete");
+      //window.self.close();
+      }
+      );
+    }
+ 
+ 
+    
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1);
+        if (c.indexOf(name) != -1) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "Not Found";
+   }
+   
+function checkRoundComplete()
+{
+  $.post("roundCompleteCheck.php",
+    {
+      GameID:getCookie("SBEGame_GameID"),
+      RoundNum:getCookie("SBEGame_RoundNum")-1
+    },
+    function (data, status){
+    //alert("From roundCompleteCheck:" + data + "\nStatus: " +status);
+    document.getElementById("userMessage").innerHTML = data;
+    if (data = "Waiting")
+    {
+      return false;
+    }
+    else
+    {
+      return true;
+    }  
+    }
+    );
+ }        
+</script>
+</head>
+
+<body>
+
+<button onclick="selectValue(1)">Select 1</button>
+<button onclick="selectValue(2)">Select 2</button>
+<p id = "userMessage"></p>
+
+</body>
+</html>
